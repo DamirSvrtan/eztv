@@ -13,5 +13,5 @@ nonny = EZTV::Series.new("nonny")
 begin
   nonny.episodes
 rescue EZTV::SeriesNotFoundError => e
-  puts "Nonny doesn't exist"
+  puts e.message
 end

@@ -4,17 +4,21 @@ require 'pry'
 
 module EZTV
   class SeriesNotFoundError < StandardError
+    def initialize(series)
+      msg = "Unable to find '#{series.name}' on https://eztv.it."
+      super(msg)
+    end
   end
 
   class Series
     include HTTParty
     base_uri 'http://eztv.it'
 
-    attr_reader :show_name
+    attr_reader :name
 
-    def initialize(show_name)
-      @show_name = show_name
-      @options = { body: {'SearchString' => @show_name}}
+    def initialize(name)
+      @name = name
+      @options = { body: {'SearchString' => @name}}
     end
 
     def episodes
@@ -25,10 +29,10 @@ module EZTV
 
       episodes = document.css('html body div#header_holder table.forum_header_border tr.forum_header_border')
 
-      raise SeriesNotFoundError if episodes.empty?
+      raise SeriesNotFoundError.new(self) if episodes.empty?
 
       episodes = episodes.reject do |episode| 
-        episode.css('img').first.attributes['title'].value.match(/Show Description about #{show_name}/i).nil?
+        episode.css('img').first.attributes['title'].value.match(/Show Description about #{name}/i).nil?
       end
 
       @episodes = EpisodeFactory.create(episodes)
