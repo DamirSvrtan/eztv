@@ -43,12 +43,15 @@ white_collar.episode(1,1).links
 Get number of seasons or number of episodes per season:
 ```ruby
 puts "Number of seasons: #{white_collar.seasons.count}"
+# Number of seasons: 5
 puts "Number of episodes in season 1: #{white_collar.season(1).count}"
+# Number of episodes in season 1: 13
 ```
 
 Get the last episode of the latest season in SxxExx format:
 ```ruby
 white_collar.episodes.last.s01e01_format
+# S05E13
 ```
 There will be an error raised if you browsed for a non existing series:
 ```ruby
