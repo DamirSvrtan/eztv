@@ -1,35 +1,32 @@
 require 'httparty'
+require 'nokogiri'
 require 'pry'
 
 module EZTV
-  class ServerError < StandardError
-  end
-
-  class Base
+  class Series
     include HTTParty
-    base_uri 'http://ezrss.it/search/index.php'
+    base_uri 'http://eztv.it'
 
-    RETRIES = 3
+    attr_reader :show_name
 
     def initialize(show_name)
-      @options = { :query => {show_name: show_name, mode: "rss"} }
-      @retries = RETRIES
+      @show_name = show_name
+      @options = { body: {'SearchString' => @show_name}}
     end
 
     def episodes
       return @episodes if @episodes
+      
+      result = self.class.post('/search/',@options)
+      document = Nokogiri::HTML(result)
 
-      result = self.class.get('',@options)
-      if result.response.code_type == Net::HTTPServiceUnavailable
-        if @retries > 0
-          @retries -= 1
-          self.episodes
-        else
-          raise ServerError
-        end
-      else
-        @episodes = EpisodeFactory.create(result['rss']['channel']['item'])
+      episodes = document.css('html body div#header_holder table.forum_header_border tr.forum_header_border')
+
+      episodes = episodes.reject do |episode| 
+        episode.css('img').first.attributes['title'].value.match(/Show Description about #{show_name}/i).nil?
       end
+
+      @episodes = EpisodeFactory.create(episodes)
     end
 
     def episode(season, episode_number)
@@ -54,22 +51,34 @@ module EZTV
   end
 
   class Episode
-    attr_accessor :show_name, :title, :season, :episode_number, :link, :magnet_link
+    attr_accessor :season, :episode_number, :links, :magnet_link
 
-    def initialize(episode_hash)
-      desc = episode_hash["description"].split(';')
-      @show_name = desc[0].match(/Show Name: (.+)/)[1]
-      @title = desc[1].match(/Episode Title: (.+)/)[1]
-      @season = desc[2].match(/Season: (.+)/)[1].to_i
-      @episode_number = desc[3].match(/Episode: (.+)/)[1].to_i
-      @link = episode_hash["enclosure"]["url"]
-      @magnet_link = episode_hash["torrent"]["magnetURI"]
+    def initialize(episode_node)
+      begin
+        inner_text = episode_node.css('td.forum_thread_post a.epinfo').first.inner_text
+        season_episode_match_data = inner_text.match(/S(\d{1,2})E(\d{1,2})/) || inner_text.match(/(\d{1,2})x(\d{1,2})/)
+
+        @season = season_episode_match_data[1].to_i
+        @episode_number = season_episode_match_data[2].to_i
+
+        links_data = episode_node.css('td.forum_thread_post')[2]
+
+        @magnet_link = links_data.css('a.magnet').first.attributes['href'].value
+
+        @links = links_data.css('a')[2..-1].map do |a_element|
+          a_element['href']
+        end
+      rescue => e
+        binding.pry
+      end
     end
+
   end
 end
 
-white_collar = EZTV::Base.new("white collar")
+white_collar = EZTV::Series.new("white collar")
+episodes = white_collar.episodes
 
-reze = white_collar.episode(1,3)
-binding.pry
-
+episodes.each do |episode|
+  puts episode.magnet_link
+end
