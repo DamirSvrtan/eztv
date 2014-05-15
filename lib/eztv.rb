@@ -3,6 +3,9 @@ require 'nokogiri'
 require 'pry'
 
 module EZTV
+  SE_FORMAT = /S(\d{1,2})E(\d{1,2})/
+  X_FORMAT = /(\d{1,2})x(\d{1,2})/
+
   class SeriesNotFoundError < StandardError
     def initialize(series)
       msg = "Unable to find '#{series.name}' on https://eztv.it."
@@ -12,9 +15,8 @@ module EZTV
 
   class Series
     include HTTParty
-    base_uri 'http://eztv.it'
-
     attr_reader :name
+    base_uri 'http://eztv.it'
 
     def initialize(name)
       @name = name
@@ -26,7 +28,6 @@ module EZTV
       
       result = self.class.post('/search/',@options)
       document = Nokogiri::HTML(result)
-
       episodes = document.css('html body div#header_holder table.forum_header_border tr.forum_header_border')
 
       raise SeriesNotFoundError.new(self) if episodes.empty?
@@ -42,6 +43,13 @@ module EZTV
       episodes.find do |episode|
         episode.season == season and episode.episode_number == episode_number
       end
+    end
+
+    def get(s01e01_format)
+      season_episode_match_data = s01e01_format.match(EZTV::SE_FORMAT)
+      season  = season_episode_match_data[1].to_i
+      episode_number = season_episode_match_data[2].to_i
+      return episode(season, episode_number)
     end
 
     def season(season)
@@ -62,14 +70,11 @@ module EZTV
   end
 
   class Episode
-    SE_FORMAT = /S(\d{1,2})E(\d{1,2})/
-    X_FORMAT = /(\d{1,2})x(\d{1,2})/
-
     attr_accessor :season, :episode_number, :links, :magnet_link
 
     def initialize(episode_node)
       inner_text = episode_node.css('td.forum_thread_post a.epinfo').first.inner_text
-      season_episode_match_data = inner_text.match(SE_FORMAT) || inner_text.match(X_FORMAT)
+      season_episode_match_data = inner_text.match(EZTV::SE_FORMAT) || inner_text.match(EZTV::X_FORMAT)
 
       @season = season_episode_match_data[1].to_i
       @episode_number = season_episode_match_data[2].to_i
@@ -84,7 +89,7 @@ module EZTV
     end
 
     def s01e01_format
-      @s01e01_format ||= "S" + season.to_s.rjust(2,'0') + "E" + episode_number.to_s.rjust(2,'0')
+      @s01e01_format ||= "S#{season.to_s.rjust(2,'0')}E#{episode_number.to_s.rjust(2,'0')}"
     end
   end
 end
