@@ -1,6 +1,6 @@
-# Eztv
+# EZTV
 
-TODO: Write a gem description
+A Ruby scraper for the catastrophic EZTV API. It is not using the RSS feed since it doesn't work well, so it scrapes the search results.
 
 ## Installation
 
@@ -18,7 +18,24 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+```ruby
+white_collar = EZTV::Series.new("white collar")
+
+white_collar.episodes.each do |episode|
+  puts episode.magnet_link
+end
+
+puts "Number of seasons: #{white_collar.seasons.count}"
+puts "Number of episodes in season 1: #{white_collar.season(1).count}"
+
+nonny = EZTV::Series.new("nonny")
+begin
+  nonny.episodes
+rescue EZTV::SeriesNotFoundError => e
+  puts e.message 
+  => "Unable to find 'nonny' on https://eztv.it."
+end
+```
 
 ## Contributing
 
