@@ -2,7 +2,7 @@
 [![Build Status](https://travis-ci.org/DamirSvrtan/eztv.svg?branch=master)](https://travis-ci.org/DamirSvrtan/eztv)
 [![Gem Version](https://badge.fury.io/rb/eztv.svg)](http://badge.fury.io/rb/eztv)
 
-A Ruby scraper for the catastrophic EZTV API. It is not using the RSS feed since it doesn't work well, so it scrapes the search results.
+A Ruby scraper as a substitution for the catastrophic [EZTV](http://eztv.it/) API. It is not using the RSS feed since it doesn't work well, so it scrapes the search results.
 
 ## Installation
 
@@ -48,7 +48,7 @@ puts "Number of episodes in season 1: #{white_collar.season(1).count}"
 # Number of episodes in season 1: 13
 ```
 
-Get the last episode of the latest season in SxxExx format:
+Get the last episode of the latest season in S01E01 format:
 ```ruby
 white_collar.episodes.last.s01e01_format
 # S05E13
