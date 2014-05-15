@@ -10,7 +10,7 @@ class TestExistingSeries < Minitest::Test
   end
 
   def test_episodes_count
-    assert_equal 75, @white_collar.episodes.count
+    assert_equal 73, @white_collar.episodes.count
   end
 
   def test_seasons_count

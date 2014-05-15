@@ -65,7 +65,7 @@ module EZTV
     def self.create(episodes_array)
       episodes = episodes_array.reverse.map do |episode_hash|
         Episode.new(episode_hash)
-      end
+      end.uniq
     end
   end
 
@@ -90,6 +90,14 @@ module EZTV
 
     def s01e01_format
       @s01e01_format ||= "S#{season.to_s.rjust(2,'0')}E#{episode_number.to_s.rjust(2,'0')}"
+    end
+
+    def eql?(other)
+      other.hash == self.hash
+    end
+
+    def hash
+      [episode_number, season].hash
     end
   end
 end
