@@ -84,7 +84,7 @@ module EZTV
     end
 
     def s01e01_format
-      @s01e01_format ||= "S" + season.to_s.rjust(2,'0') + "E" + season.to_s.rjust(2,'0')
+      @s01e01_format ||= "S" + season.to_s.rjust(2,'0') + "E" + episode_number.to_s.rjust(2,'0')
     end
   end
 end
