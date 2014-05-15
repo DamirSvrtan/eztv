@@ -1,15 +1,14 @@
 # coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'eztv/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "eztv"
-  spec.version       = Eztv::VERSION
+  spec.version       = "0.0.1"
   spec.authors       = ["Damir Svrtan"]
   spec.email         = ["damir.svrtan@gmail.com"]
-  spec.summary       = %q{TODO: Write a short summary. Required.}
-  spec.description   = %q{TODO: Write a longer description. Optional.}
+  spec.summary       = "EZTV wrapper in Ruby"
+  spec.description   = "EZTV wrapper for the catastrophic EZTV API."
   spec.homepage      = ""
   spec.license       = "MIT"
 
@@ -20,4 +19,5 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", "~> 1.5"
   spec.add_development_dependency "rake"
+  spec.add_development_dependency "minitest"
 end

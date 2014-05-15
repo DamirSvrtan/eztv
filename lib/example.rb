@@ -1,4 +1,5 @@
-require_relative 'eztv/app'
+require_relative 'eztv'
+
 white_collar = EZTV::Series.new("white collar")
 
 white_collar.episodes.each do |episode|
