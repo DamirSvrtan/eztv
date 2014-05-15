@@ -16,6 +16,13 @@ class TestExistingSeries < Minitest::Test
   def test_seasons_count
     assert_equal 5, @white_collar.seasons.count
   end
+
+  def test_first_episode
+    first_episode = @white_collar.episodes.first
+    assert_equal 1, first_episode.episode_number
+    assert_equal 1, first_episode.season
+    assert_equal "S01E01", first_episode.s01e01_format
+  end
 end
 
 class TestNonExistingSeries < Minitest::Test

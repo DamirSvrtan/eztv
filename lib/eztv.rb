@@ -55,7 +55,7 @@ module EZTV
 
   module EpisodeFactory
     def self.create(episodes_array)
-      episodes = episodes_array.map do |episode_hash|
+      episodes = episodes_array.reverse.map do |episode_hash|
         Episode.new(episode_hash)
       end
     end
@@ -68,24 +68,23 @@ module EZTV
     attr_accessor :season, :episode_number, :links, :magnet_link
 
     def initialize(episode_node)
-      begin
-        inner_text = episode_node.css('td.forum_thread_post a.epinfo').first.inner_text
-        season_episode_match_data = inner_text.match(SE_FORMAT) || inner_text.match(X_FORMAT)
+      inner_text = episode_node.css('td.forum_thread_post a.epinfo').first.inner_text
+      season_episode_match_data = inner_text.match(SE_FORMAT) || inner_text.match(X_FORMAT)
 
-        @season = season_episode_match_data[1].to_i
-        @episode_number = season_episode_match_data[2].to_i
+      @season = season_episode_match_data[1].to_i
+      @episode_number = season_episode_match_data[2].to_i
 
-        links_data = episode_node.css('td.forum_thread_post')[2]
+      links_data = episode_node.css('td.forum_thread_post')[2]
 
-        @magnet_link = links_data.css('a.magnet').first.attributes['href'].value
+      @magnet_link = links_data.css('a.magnet').first.attributes['href'].value
 
-        @links = links_data.css('a')[2..-1].map do |a_element|
-          a_element['href']
-        end
-      rescue => e
-        binding.pry
+      @links = links_data.css('a')[2..-1].map do |a_element|
+        a_element['href']
       end
     end
 
+    def s01e01_format
+      @s01e01_format ||= "S" + season.to_s.rjust(2,'0') + "E" + season.to_s.rjust(2,'0')
+    end
   end
 end
