@@ -9,17 +9,27 @@ module EZTV
     include HTTParty
     base_uri 'http://ezrss.it/search/index.php'
 
+    RETRIES = 3
+
     def initialize(show_name)
       @options = { :query => {show_name: show_name, mode: "rss"} }
+      @retries = RETRIES
     end
 
     def episodes
       return @episodes if @episodes
 
       result = self.class.get('',@options)
-      raise ServerError if result.response.code_type == Net::HTTPServiceUnavailable
-      
-      @episodes = EpisodeFactory.create(result['rss']['channel']['item'])
+      if result.response.code_type == Net::HTTPServiceUnavailable
+        if @retries > 0
+          @retries -= 1
+          self.episodes
+        else
+          raise ServerError
+        end
+      else
+        @episodes = EpisodeFactory.create(result['rss']['channel']['item'])
+      end
     end
 
     def episode(season, episode_number)
@@ -31,6 +41,14 @@ module EZTV
     def season(season)
       episodes.find_all do |episode|
         episode.season == season
+      end
+    end
+  end
+
+  module EpisodeFactory
+    def self.create(episodes_array)
+      episodes = episodes_array.map do |episode_hash|
+        Episode.new(episode_hash)
       end
     end
   end
@@ -48,23 +66,10 @@ module EZTV
       @magnet_link = episode_hash["torrent"]["magnetURI"]
     end
   end
-
-  module EpisodeFactory
-    def self.create(episodes_array)
-      episodes = episodes_array.map do |episode_hash|
-        Episode.new(episode_hash)
-      end
-    end
-  end
 end
 
 white_collar = EZTV::Base.new("white collar")
 
 reze = white_collar.episode(1,3)
 binding.pry
-  # options = {show_name: "trophy wife", mode: :rss}
-  # response = HTTParty.get('http://ezrss.it/search/index.php', query: options)
-  # binding.pry
-  # #response["rss"]["channel"]["item"].first["description"]
-  # puts response.body, response.code, response.message, response.headers.inspect
 
