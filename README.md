@@ -55,6 +55,12 @@ Get the last episode of the latest season in S01E01 format:
 white_collar.episodes.last.s01e01_format
 # S05E13
 ```
+
+Fetch an episode in S01E01 format:
+```ruby
+white_collar.get('S03E05')
+# EZTV::Episode.new
+```
 There will be an error raised if you browsed for a non existing series:
 ```ruby
 nonny = EZTV::Series.new("nonny")
