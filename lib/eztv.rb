@@ -1,6 +1,7 @@
 require 'httparty'
 require 'nokogiri'
 require 'pry'
+require 'uri'
 
 module EZTV
   SE_FORMAT = /S(\d{1,2})E(\d{1,2})/
@@ -21,7 +22,7 @@ module EZTV
     base_uri 'http://eztv.ag'
 
     def initialize(name)
-      @name = name
+      @name = URI::escape( name )
     end
 
     def high_def!

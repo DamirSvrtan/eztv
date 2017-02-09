@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |spec|
   spec.name          = "eztv"
-  spec.version       = "0.0.4"
+  spec.version       = "0.0.5"
   spec.authors       = ["Damir Svrtan"]
   spec.email         = ["damir.svrtan@gmail.com"]
   spec.summary       = "EZTV wrapper in Ruby"
@@ -24,4 +24,5 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "nokogiri"
   spec.add_runtime_dependency "httparty"
   spec.add_runtime_dependency "pry"
+  spec.add_runtime_dependency "uri"
 end
