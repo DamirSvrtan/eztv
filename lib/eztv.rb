@@ -34,7 +34,7 @@ module EZTV
     end
 
     def episode(season, episode_number)
-      episodes.find do |episode|
+      episodes().find do |episode|
         episode.season == season and episode.episode_number == episode_number
       end
     end
@@ -47,11 +47,11 @@ module EZTV
     end
 
     def season(season)
-      episodes.find_all {|episode| episode.season == season }
+      episodes().find_all {|episode| episode.season == season }
     end
 
     def seasons
-      episodes.group_by {|episode| episode.season }.to_hash.values
+      episodes().sort.group_by {|episode| episode.season }
     end
 
     private
