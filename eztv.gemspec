@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake"
   spec.add_development_dependency "minitest"
 
-  spec.add_runtime_dependency "nokogiri"
+  spec.add_runtime_dependency "nokogiri", "~> 1.6.8.1"
   spec.add_runtime_dependency "httparty"
   spec.add_runtime_dependency "pry"
 end
